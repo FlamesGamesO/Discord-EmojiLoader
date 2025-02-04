@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Emoji Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="flex justify-center items-center h-screen">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-3xl font-bold text-center mb-6">Discord Emoji Downloader</h1>
+            <form id="downloadForm" class="space-y-4">
+                <div>
+                    <label for="serverId" class="block text-sm font-medium">Server ID</label>
+                    <input type="text" id="serverId" class="w-full p-3 mt-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter Server ID" required>
+                </div>
+                <div>
+                    <label for="userToken" class="block text-sm font-medium">Your Token</label>
+                    <input type="text" id="userToken" class="w-full p-3 mt-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter your Discord Token" required>
+                </div>
+                <button type="submit" class="w-full p-3 bg-blue-600 rounded text-white font-bold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600">Download Emojis</button>
+            </form>
+            <div id="loading" class="mt-4 text-center text-yellow-300 hidden">Downloading...</div>
+            <div id="status" class="mt-4 text-center text-green-500 hidden">Emojis downloaded successfully!</div>
+            <div id="error" class="mt-4 text-center text-red-500 hidden">Error occurred. Please check your details.</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("downloadForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            const serverId = document.getElementById("serverId").value;
+            const userToken = document.getElementById("userToken").value;
+            
+            document.getElementById("loading").classList.remove("hidden");
+            document.getElementById("status").classList.add("hidden");
+            document.getElementById("error").classList.add("hidden");
+
+            try {
+                const response = await fetch("/download-emojis", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ serverId, userToken })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById("loading").classList.add("hidden");
+                    document.getElementById("status").classList.remove("hidden");
+                } else {
+                    document.getElementById("loading").classList.add("hidden");
+                    document.getElementById("error").classList.remove("hidden");
+                }
+            } catch (error) {
+                document.getElementById("loading").classList.add("hidden");
+                document.getElementById("error").classList.remove("hidden");
+            }
+        });
+    </script>
+</body>
+</html>
